@@ -1,0 +1,43 @@
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: employee-ms
+
+soap:
+  service:
+    url: ${SOAP_SERVICE_URL:http://localhost:8091/ws}
+
+validation:
+  groovy:
+    script: classpath:validation/employee-validation.groovy
+
+app:
+  security:
+    jwt:
+      mode: ${JWT_MODE:local}
+      secret: ${JWT_SECRET:}
+      issuer: ${JWT_ISSUER:parameta-employee-ms}
+      expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+    user:
+      username: ${APP_USER:rrhh}
+      password: ${APP_PASSWORD:}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    oauth:
+      use-pkce-with-authorization-code-grant: true

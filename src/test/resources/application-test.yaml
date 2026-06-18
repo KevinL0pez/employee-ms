@@ -1,0 +1,16 @@
+app:
+  security:
+    jwt:
+      mode: local
+      secret: test-jwt-secret-key-minimum-32-characters
+      issuer: parameta-test
+      expiration-minutes: 60
+    user:
+      username: rrhh
+      password: rrhh
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

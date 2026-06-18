@@ -1,0 +1,20 @@
+# Perfil AWS: activar con SPRING_PROFILES_ACTIVE=aws
+# Valida JWT emitidos por Amazon Cognito (RS256 via JWKS).
+
+app:
+  security:
+    jwt:
+      mode: cognito
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
