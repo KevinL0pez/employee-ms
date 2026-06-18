@@ -16,7 +16,12 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-/** JSON responses for Spring Security authentication and authorization failures. */
+/**
+ * Writes RFC 7807-style JSON error bodies for Spring Security filter-chain failures.
+ *
+ * <p>Replaces default HTML error pages so API clients always receive JSON:
+ * {@code 401 Unauthorized} (missing/invalid token) and {@code 403 Forbidden} (valid token, insufficient role).
+ */
 @Component
 @RequiredArgsConstructor
 public class SecurityProblemSupport implements AuthenticationEntryPoint, AccessDeniedHandler {

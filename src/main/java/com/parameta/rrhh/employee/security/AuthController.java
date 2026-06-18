@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Local token endpoint. Not available in AWS/Cognito mode ({@code JWT_MODE=cognito}).
+ * REST entry point for obtaining JWT access tokens in local/Docker environments.
+ *
+ * <p>{@code POST /auth/login} is the only authentication endpoint exposed by this service.
+ * It is disabled when {@code JWT_MODE=cognito}; in production AWS clients authenticate
+ * against Cognito and call {@code /employee/validate} with Cognito-issued tokens.
  */
 @Tag(name = "Authentication")
 @RestController
@@ -27,12 +31,16 @@ public class AuthController {
         this.localAuthService = localAuthService;
     }
 
+    /**
+     * Validates credentials and returns a signed JWT. Does not create server-side sessions.
+     */
     @Operation(summary = "Obtain a JWT access token (local mode only)")
     @PostMapping("/login")
     public LocalAuthService.TokenResponse login(@Valid @RequestBody LoginRequest request) {
         return localAuthService.login(request.getUsername(), request.getPassword());
     }
 
+    /** JSON body for {@link #login(LoginRequest)}. */
     @Getter
     @Setter
     public static class LoginRequest {

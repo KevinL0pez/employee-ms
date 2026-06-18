@@ -15,7 +15,17 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-/** Issues signed JWT access tokens for the local authentication flow. */
+/**
+ * Issues HS256-signed JWT access tokens for the local authentication flow.
+ *
+ * <p>Flow: credentials are validated by Spring Security's {@link AuthenticationManager};
+ * on success a JWT is built with {@code sub}, {@code iss}, {@code iat}, {@code exp}
+ * and a custom {@code roles} claim. The token is returned to the client and is
+ * <strong>not</strong> stored server-side (stateless session).
+ *
+ * <p>Active only when {@code JWT_MODE=local} (default). In Cognito mode this bean
+ * is not registered and clients obtain tokens directly from AWS.
+ */
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.security.jwt.mode", havingValue = "local", matchIfMissing = true)
@@ -25,6 +35,14 @@ public class LocalAuthService {
     private final JwtEncoder jwtEncoder;
     private final SecurityProperties securityProperties;
 
+    /**
+     * Authenticates the user and returns a Bearer access token.
+     *
+     * @param username value from {@code APP_USER} (default {@code rrhh})
+     * @param password value from {@code APP_PASSWORD}
+     * @return token payload compatible with OAuth2 client expectations
+     * @throws org.springframework.security.core.AuthenticationException if credentials are invalid
+     */
     public TokenResponse login(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
@@ -54,5 +72,13 @@ public class LocalAuthService {
         return new TokenResponse(token, "Bearer", expiresInSeconds);
     }
 
+    /**
+     * OAuth2-style token response. The client must persist {@link #accessToken()} and
+     * send it on subsequent requests as {@code Authorization: Bearer <token>}.
+     *
+     * @param accessToken signed JWT string
+     * @param tokenType   always {@code Bearer}
+     * @param expiresIn   seconds until {@code exp} claim
+     */
     public record TokenResponse(String accessToken, String tokenType, long expiresIn) {}
 }

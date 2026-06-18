@@ -22,7 +22,24 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 /**
- * Executes employee validation rules from an external Groovy script.
+ * Groovy Shell engine that externalizes employee validation rules from Java bytecode.
+ *
+ * <p>The script {@code validation/employee-validation.groovy} is loaded once at runtime,
+ * compiled with {@link GroovyClassLoader} and executed per request. The engine injects:
+ * <ul>
+ *   <li>{@code request} — {@link EmployeeRequestDTO} with raw query parameters</li>
+ *   <li>{@code today} — current date from an injectable {@link Clock} (testable)</li>
+ * </ul>
+ *
+ * <p>Expected script contract:
+ * <ul>
+ *   <li>On validation errors: return {@code [errors: List<String>]}</li>
+ *   <li>On success: return a {@code Map} with typed fields matching {@link ValidatedEmployee}</li>
+ * </ul>
+ *
+ * <p>Script location is configurable via {@code validation.groovy.script} (default: classpath).
+ *
+ * @see EmployeeValidationServiceImpl
  */
 @Slf4j
 @Component
@@ -42,11 +59,13 @@ public class GroovyEmployeeValidationEngine {
         this.scriptResource = resourceLoader.getResource(scriptLocation);
     }
 
+    /** Package-private constructor for unit tests with a custom {@link Resource}. */
     GroovyEmployeeValidationEngine(Clock clock, Resource scriptResource) {
         this.clock = clock;
         this.scriptResource = scriptResource;
     }
 
+    /** Factory for tests; uses the default classpath script. */
     public static GroovyEmployeeValidationEngine forTesting(Clock clock) {
         return new GroovyEmployeeValidationEngine(
                 clock,
@@ -55,6 +74,14 @@ public class GroovyEmployeeValidationEngine {
         );
     }
 
+    /**
+     * Runs the Groovy script against the incoming request.
+     *
+     * @param request employee data from the REST layer
+     * @return normalized and validated domain object
+     * @throws com.parameta.rrhh.employee.exception.ValidationException when the script returns errors
+     * @throws IllegalStateException when the script is missing or returns an invalid structure
+     */
     public ValidatedEmployee validate(EmployeeRequestDTO request) {
         try {
             Script script = createScript(request);

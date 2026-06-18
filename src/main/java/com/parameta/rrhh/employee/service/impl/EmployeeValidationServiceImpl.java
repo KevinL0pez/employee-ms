@@ -8,7 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Delegates employee validation to the Groovy Shell script.
+ * Application service that delegates validation to {@link GroovyEmployeeValidationEngine}.
+ *
+ * <p>Keeps controllers and orchestration ({@link com.parameta.rrhh.employee.service.impl.EmployeeServiceImpl})
+ * free of Groovy-specific APIs. Business rules live in the external script so they can evolve
+ * without recompiling Java for every rule change.
  */
 @Service
 @RequiredArgsConstructor
@@ -16,6 +20,9 @@ public class EmployeeValidationServiceImpl implements IEmployeeValidationService
 
     private final GroovyEmployeeValidationEngine groovyEmployeeValidationEngine;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ValidatedEmployee validate(EmployeeRequestDTO request) {
         return groovyEmployeeValidationEngine.validate(request);

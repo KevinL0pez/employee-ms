@@ -8,7 +8,12 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
-/** Security settings for JWT, users and CORS. */
+/**
+ * Type-safe binding of {@code app.security.*} properties from YAML and environment variables.
+ *
+ * <p>On startup, validates that {@code JWT_SECRET} (≥ 32 chars) and {@code APP_PASSWORD}
+ * are present when {@code JWT_MODE=local}. Cognito mode skips local secret validation.
+ */
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app.security")
@@ -33,6 +38,7 @@ public class SecurityProperties {
         }
     }
 
+    /** JWT issuer, secret, expiration and deployment mode ({@code local} | {@code cognito}). */
     @Getter
     @Setter
     public static class Jwt {
@@ -50,6 +56,7 @@ public class SecurityProperties {
         }
     }
 
+    /** Credentials for {@code POST /auth/login} in local mode ({@code APP_USER}, {@code APP_PASSWORD}). */
     @Getter
     @Setter
     public static class User {
@@ -57,6 +64,7 @@ public class SecurityProperties {
         private String password;
     }
 
+    /** Allowed browser origins for CORS ({@code CORS_ALLOWED_ORIGINS}). */
     @Getter
     @Setter
     public static class Cors {

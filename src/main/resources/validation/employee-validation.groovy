@@ -1,3 +1,15 @@
+/*
+ * Employee validation rules executed by GroovyEmployeeValidationEngine.
+ *
+ * Bindings (injected by the engine):
+ *   - request : EmployeeRequestDTO — raw REST input
+ *   - today   : LocalDate          — reference date for age and date checks
+ *
+ * Return contract:
+ *   - Failure: [errors: List<String>]
+ *   - Success: Map with keys names, lastNames, typeDocument, documentNumber,
+ *              dateOfBirth, dateAffiliationCompany, position, salary
+ */
 package validation
 
 import java.time.LocalDate

@@ -426,3 +426,5 @@ employee-ms/
 | `validation/groovy` | Reglas de negocio externalizadas en Groovy |
 | `client` + `soap` | Integración con `soap-ms` |
 | `exception` | Respuestas HTTP estandarizadas (400, 401, 409, 502) |
+
+---

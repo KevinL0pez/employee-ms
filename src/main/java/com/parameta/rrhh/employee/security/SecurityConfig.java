@@ -21,12 +21,27 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Central Spring Security configuration for {@code employee-ms}.
+ *
+ * <p>The API is stateless: every protected request must carry a valid JWT in the
+ * {@code Authorization: Bearer} header. In {@code local} mode credentials are validated
+ * via {@link LocalAuthService}; in {@code cognito} mode tokens are verified against
+ * Amazon Cognito JWKS (see {@code application-aws.yaml}).
+ *
+ * <p>Public endpoints: {@code POST /auth/login}, actuator health/info and OpenAPI.
+ * Business endpoints under {@code /employee/**} require role {@code RRHH}.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
 
+    /**
+     * Configures CORS, disables CSRF (stateless API), registers the OAuth2 resource server
+     * and maps authorization rules per URL pattern.
+     */
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -58,6 +73,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * In-memory user store for local/Docker login. Active only when {@code JWT_MODE=local}.
+     */
     @Bean
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
             name = "app.security.jwt.mode",
@@ -80,6 +98,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Exposes Spring's {@link AuthenticationManager} for {@link LocalAuthService#login}.
+     */
     @Bean
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
             name = "app.security.jwt.mode",

@@ -10,10 +10,23 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.stereotype.Component;
 
-/** Maps JWT claims to Spring Security authorities (local roles and Cognito groups). */
+/**
+ * Bridges JWT claims to Spring Security {@link org.springframework.security.core.GrantedAuthority}.
+ *
+ * <p>Supports two token issuers without code changes in controllers:
+ * <ul>
+ *   <li><strong>Local:</strong> reads the {@code roles} claim (e.g. {@code ["RRHH"]})</li>
+ *   <li><strong>Cognito:</strong> reads {@code cognito:groups} and maps them to {@code ROLE_*} authorities</li>
+ * </ul>
+ *
+ * <p>Used by the OAuth2 resource server configured in {@link SecurityConfig}.
+ */
 @Component
 public class JwtAuthorityConverter {
 
+    /**
+     * Builds the converter wired into {@code oauth2ResourceServer().jwt()}.
+     */
     public JwtAuthenticationConverter authenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter());
