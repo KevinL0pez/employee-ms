@@ -64,6 +64,21 @@ class SecurityAuthIntegrationTest {
     }
 
     @Test
+    void shouldRejectLoginWithInvalidCredentials() throws Exception {
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setUsername("rrhh");
+        loginRequest.setPassword("wrong-password");
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.messages").value("Invalid username or password"));
+    }
+
+    @Test
     void shouldLoginAndAccessProtectedEndpointWithToken() throws Exception {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setUsername("rrhh");

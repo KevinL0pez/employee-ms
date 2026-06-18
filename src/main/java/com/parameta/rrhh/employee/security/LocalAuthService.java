@@ -3,6 +3,8 @@ package com.parameta.rrhh.employee.security;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -75,13 +77,13 @@ public class LocalAuthService {
      * @param tokenType   always {@code Bearer}
      * @param expiresIn   seconds until {@code exp} claim
      */
-    @io.swagger.v3.oas.annotations.media.Schema(description = "JWT access token issued after successful login")
+    @Schema(description = "JWT access token issued after successful login")
     public record TokenResponse(
-            @io.swagger.v3.oas.annotations.media.Schema(description = "Signed JWT access token", example = "eyJhbGciOiJIUzI1NiIs...")
+            @Schema(description = "Signed JWT access token", example = "eyJhbGciOiJIUzI1NiIs...")
             String accessToken,
-            @io.swagger.v3.oas.annotations.media.Schema(description = "Token type", example = "Bearer")
+            @Schema(description = "Token type", example = "Bearer")
             String tokenType,
-            @io.swagger.v3.oas.annotations.media.Schema(description = "Token lifetime in seconds", example = "3600")
+            @Schema(description = "Token lifetime in seconds", example = "3600")
             long expiresIn
     ) {}
 }

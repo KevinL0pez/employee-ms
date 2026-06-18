@@ -7,6 +7,7 @@ import java.util.Map;
 import com.parameta.rrhh.employee.util.constant.Constants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +53,16 @@ public class GlobalExceptionHandler {
                 Constants.SYSTEM_STATUS, status.value(),
                 Constants.SYSTEM_ERROR, status == HttpStatus.CONFLICT ? "Conflict" : "SOAP service error",
                 Constants.SYSTEM_MESSAGES, ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                Constants.SYSTEM_TIMESTAMP, Instant.now().toString(),
+                Constants.SYSTEM_STATUS, HttpStatus.UNAUTHORIZED.value(),
+                Constants.SYSTEM_ERROR, "Unauthorized",
+                Constants.SYSTEM_MESSAGES, "Invalid username or password"
         ));
     }
 

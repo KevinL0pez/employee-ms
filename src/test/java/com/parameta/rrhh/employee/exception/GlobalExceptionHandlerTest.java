@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 
 class GlobalExceptionHandlerTest {
 
@@ -37,6 +38,16 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());
         assertEquals(502, response.getBody().get("status"));
         assertEquals("SOAP service error", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnUnauthorizedForAuthenticationException() {
+        var response = handler.handleAuthentication(new BadCredentialsException("Bad credentials"));
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(401, response.getBody().get("status"));
+        assertEquals("Unauthorized", response.getBody().get("error"));
+        assertEquals("Invalid username or password", response.getBody().get("messages"));
     }
 
     @Test

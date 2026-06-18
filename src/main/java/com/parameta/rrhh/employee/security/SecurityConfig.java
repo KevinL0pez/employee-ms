@@ -46,6 +46,13 @@ public class SecurityConfig {
             SecurityProperties securityProperties,
             JwtAuthorityConverter jwtAuthorityConverter
     ) throws Exception {
+        /*
+         * The token:
+         * Is not stored in a server-side session.
+         * Is typically not stored in an automatically sent cookie.
+         * Must be explicitly included in every request.
+         * Therefore, an external website cannot easily force requests on behalf of the user.
+         */
         StatelessCsrfConfigurer.disable(http);
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource(securityProperties)))
@@ -63,6 +70,13 @@ public class SecurityConfig {
                         .accessDeniedHandler(securityProblemSupport)
                 )
                 .exceptionHandling(ex -> ex
+                        /*
+                         * Configures security exception handling:
+                         * - 401 Unauthorized for unauthenticated requests.
+                         * - 403 Forbidden for authenticated users without sufficient permissions.
+                         *
+                         * Uses SecurityProblemSupport to return standardized RFC 7807 error responses.
+                         */
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport)
                 );
