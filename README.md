@@ -364,6 +364,82 @@ Reportes JaCoCo:
 
 ---
 
+## SonarQube — análisis de calidad
+
+SonarQube corre en Docker desde la **raíz del monorepo** (`Parameta/`). Este módulo se publica como proyecto **`parameta-employee-ms`**.
+
+### Paso 1 — Variables en `.env` (raíz del monorepo)
+
+En `Parameta/.env` (plantilla: `.env.example`):
+
+```env
+SONAR_PORT=9000
+SONAR_HOST_URL=http://localhost:9000
+SONAR_DB_USER=sonar
+SONAR_DB_PASSWORD=sonar
+SONAR_DB_NAME=sonar
+SONAR_TOKEN=tu-token-generado-en-sonarqube
+```
+
+> No commitees el token. El script de análisis solo lee variables `SONAR_*` del `.env`.
+
+### Paso 2 — Levantar SonarQube
+
+Desde la carpeta `Parameta/` (un nivel arriba de este repo):
+
+```bash
+docker compose -f docker-compose.sonar.yml up -d
+```
+
+Espera 2–3 minutos hasta que el contenedor `parameta-sonarqube` esté **healthy**.
+
+| Recurso | URL |
+|---------|-----|
+| UI SonarQube | http://localhost:9000 |
+| Login inicial | `admin` / `admin` (cambiar contraseña en el primer acceso) |
+
+### Paso 3 — Generar token (solo la primera vez)
+
+1. Entra a http://localhost:9000
+2. **My Account** → **Security** → **Generate Token**
+3. Copia el token en `SONAR_TOKEN` del `.env`
+
+No es necesario crear el proyecto manualmente: se registra en el primer análisis.
+
+### Paso 4 — Ejecutar análisis de este módulo
+
+**Opción A — script (ambos microservicios):**
+
+```bash
+# Desde Parameta/
+.\scripts\sonar-analyze.ps1          # Windows
+./scripts/sonar-analyze.sh           # Linux / macOS / Git Bash
+```
+
+**Opción B — solo `employee-ms`:**
+
+```bash
+cd employee-ms
+./mvnw clean verify sonar:sonar -Dsonar.token=TU_TOKEN
+```
+
+En PowerShell:
+
+```powershell
+$env:SONAR_TOKEN = "tu-token"
+.\mvnw.cmd clean verify sonar:sonar "-Dsonar.token=$env:SONAR_TOKEN"
+```
+
+`verify` ejecuta tests, genera JaCoCo y sube el reporte a SonarQube.
+
+### Paso 5 — Ver resultados
+
+http://localhost:9000/dashboard?id=parameta-employee-ms
+
+Guía ampliada: `docs/07-sonarqube.md` (en la raíz del monorepo).
+
+---
+
 ## Estructura del repositorio
 
 ### Módulo `employee-ms`

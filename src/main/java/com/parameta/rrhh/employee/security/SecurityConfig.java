@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,8 +36,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     /**
-     * Configures CORS, disables CSRF (stateless API), registers the OAuth2 resource server
-     * and maps authorization rules per URL pattern.
+     * Configures CORS, CSRF policy for stateless JWT ({@link StatelessCsrfConfigurer}),
+     * OAuth2 resource server and authorization rules per URL pattern.
      */
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -47,8 +46,8 @@ public class SecurityConfig {
             SecurityProperties securityProperties,
             JwtAuthorityConverter jwtAuthorityConverter
     ) throws Exception {
+        StatelessCsrfConfigurer.disable(http);
         http
-                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource(securityProperties)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
