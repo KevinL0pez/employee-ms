@@ -1,6 +1,6 @@
 package com.parameta.rrhh.employee.validation.groovy;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
 import com.parameta.rrhh.employee.exception.ValidationException;
 import groovy.lang.Binding;
@@ -16,6 +16,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,8 @@ import org.springframework.util.StreamUtils;
 /**
  * Groovy Shell engine that externalizes employee validation rules from Java bytecode.
  *
- * <p>The script {@code validation/employee-validation.groovy} is loaded once at runtime,
- * compiled with {@link GroovyClassLoader} and executed per request. The engine injects:
+ * <p>The script {@code validation/employee-validation.groovy} is compiled once when the bean
+ * is created and executed per request with {@link GroovyClassLoader}. The engine injects:
  * <ul>
  *   <li>{@code request} — {@link EmployeeRequestDTO} with raw query parameters</li>
  *   <li>{@code today} — current date from an injectable {@link Clock} (testable)</li>
@@ -38,8 +39,6 @@ import org.springframework.util.StreamUtils;
  * </ul>
  *
  * <p>Script location is configurable via {@code validation.groovy.script} (default: classpath).
- *
- * @see EmployeeValidationServiceImpl
  */
 @Slf4j
 @Component
@@ -47,7 +46,7 @@ public class GroovyEmployeeValidationEngine {
 
     private final Clock clock;
     private final Resource scriptResource;
-    private volatile Class<? extends Script> scriptClass;
+    private final Class<? extends Script> scriptClass;
 
     @Autowired
     public GroovyEmployeeValidationEngine(
@@ -57,19 +56,21 @@ public class GroovyEmployeeValidationEngine {
     ) {
         this.clock = clock;
         this.scriptResource = resourceLoader.getResource(scriptLocation);
+        this.scriptClass = compileScriptClass();
     }
 
     /** Package-private constructor for unit tests with a custom {@link Resource}. */
     GroovyEmployeeValidationEngine(Clock clock, Resource scriptResource) {
         this.clock = clock;
         this.scriptResource = scriptResource;
+        this.scriptClass = compileScriptClass();
     }
 
     /** Factory for tests; uses the default classpath script. */
     public static GroovyEmployeeValidationEngine forTesting(Clock clock) {
         return new GroovyEmployeeValidationEngine(
                 clock,
-                new org.springframework.core.io.DefaultResourceLoader()
+                new DefaultResourceLoader()
                         .getResource("classpath:validation/employee-validation.groovy")
         );
     }
@@ -79,18 +80,16 @@ public class GroovyEmployeeValidationEngine {
      *
      * @param request employee data from the REST layer
      * @return normalized and validated domain object
-     * @throws com.parameta.rrhh.employee.exception.ValidationException when the script returns errors
+     * @throws ValidationException when the script returns errors
      * @throws IllegalStateException when the script is missing or returns an invalid structure
      */
     public ValidatedEmployee validate(EmployeeRequestDTO request) {
         try {
             Script script = createScript(request);
             return mapResult(script.run());
-        } catch (ValidationException ex) {
+        } catch (ValidationException | IllegalStateException ex) {
             throw ex;
-        } catch (IllegalStateException ex) {
-            throw ex;
-        } catch (Exception ex) {
+        }  catch (Exception ex) {
             log.error("Groovy validation script execution failed", ex);
             throw new IllegalStateException("Unable to execute employee validation script", ex);
         }
@@ -101,12 +100,11 @@ public class GroovyEmployeeValidationEngine {
         binding.setProperty("request", request);
         binding.setProperty("today", LocalDate.now(clock));
 
-        Script script = loadScriptClass().getDeclaredConstructor().newInstance();
+        Script script = scriptClass.getDeclaredConstructor().newInstance();
         script.setBinding(binding);
         return script;
     }
 
-    @SuppressWarnings("unchecked")
     private ValidatedEmployee mapResult(Object raw) {
         if (!(raw instanceof Map<?, ?> result)) {
             throw new IllegalStateException("Groovy script must return a Map");
@@ -131,26 +129,16 @@ public class GroovyEmployeeValidationEngine {
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends Script> loadScriptClass() {
-        Class<? extends Script> cached = scriptClass;
-        if (cached != null) {
-            return cached;
-        }
-
-        synchronized (this) {
-            if (scriptClass != null) {
-                return scriptClass;
-            }
-
-            try {
-                String scriptContent = readScript();
-                GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
-                scriptClass = classLoader.parseClass(scriptContent, "employee-validation.groovy");
+    private Class<? extends Script> compileScriptClass() {
+        try {
+            String scriptContent = readScript();
+            try (GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader())) {
+                Class<? extends Script> compiled = classLoader.parseClass(scriptContent, "employee-validation.groovy");
                 log.info("Loaded Groovy validation script from {}", scriptResource.getDescription());
-                return scriptClass;
-            } catch (IOException ex) {
-                throw new IllegalStateException("Unable to read Groovy validation script", ex);
+                return compiled;
             }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Unable to read Groovy validation script", ex);
         }
     }
 

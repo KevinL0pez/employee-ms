@@ -16,7 +16,6 @@ validation:
 app:
   security:
     jwt:
-      mode: ${JWT_MODE:local}
       secret: ${JWT_SECRET:}
       issuer: ${JWT_ISSUER:parameta-employee-ms}
       expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}

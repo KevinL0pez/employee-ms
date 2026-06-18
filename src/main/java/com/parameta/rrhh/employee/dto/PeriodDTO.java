@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PeriodDto {
+public class PeriodDTO {
 
     private int years;
     private int months;

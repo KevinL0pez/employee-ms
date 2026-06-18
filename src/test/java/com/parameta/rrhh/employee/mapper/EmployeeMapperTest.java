@@ -2,8 +2,8 @@ package com.parameta.rrhh.employee.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.soap.SaveEmployeeResponse;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -27,8 +27,8 @@ class EmployeeMapperTest {
     @Test
     void shouldMapToResponse() {
         ValidatedEmployee employee = sampleEmployee();
-        PeriodDto currentAge = PeriodDto.builder().years(36).months(1).days(2).build();
-        PeriodDto affiliationTime = PeriodDto.builder().years(6).months(5).days(7).build();
+        PeriodDTO currentAge = PeriodDTO.builder().years(36).months(1).days(2).build();
+        PeriodDTO affiliationTime = PeriodDTO.builder().years(6).months(5).days(7).build();
         SaveEmployeeResponse soapResponse = new SaveEmployeeResponse(10L, "Employee successfully registered");
 
         var response = mapper.toResponse(employee, currentAge, affiliationTime, soapResponse);

@@ -8,8 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
+import com.parameta.rrhh.employee.dto.LoginRequestDTO;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.service.IEmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,10 +40,10 @@ class SecurityAuthIntegrationTest {
     @BeforeEach
     void setUp() {
         when(employeeService.registerEmployee(any())).thenReturn(
-                EmployeeResponse.builder()
+                EmployeeResponseDTO.builder()
                         .names("Juan")
                         .registrationId(1L)
-                        .currentAge(PeriodDto.builder().years(36).months(0).days(0).build())
+                        .currentAge(PeriodDTO.builder().years(36).months(0).days(0).build())
                         .build()
         );
     }
@@ -64,7 +65,7 @@ class SecurityAuthIntegrationTest {
 
     @Test
     void shouldLoginAndAccessProtectedEndpointWithToken() throws Exception {
-        AuthController.LoginRequest loginRequest = new AuthController.LoginRequest();
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setUsername("rrhh");
         loginRequest.setPassword("rrhh");
 

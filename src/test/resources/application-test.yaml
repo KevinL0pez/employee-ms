@@ -1,7 +1,6 @@
 app:
   security:
     jwt:
-      mode: local
       secret: test-jwt-secret-key-minimum-32-characters
       issuer: parameta-test
       expiration-minutes: 60

@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.parameta.rrhh.employee.client.SoapEmployeeClient;
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.mapper.EmployeeMapper;
 import com.parameta.rrhh.employee.service.IEmployeeValidationService;
 import com.parameta.rrhh.employee.soap.SaveEmployeeResponse;
@@ -51,7 +51,7 @@ class EmployeeServiceImplTest {
                 5_000_000
         );
         SaveEmployeeResponse soapResponse = new SaveEmployeeResponse(1L, "Employee successfully registered");
-        EmployeeResponse expectedResponse = EmployeeResponse.builder()
+        EmployeeResponseDTO expectedResponse = EmployeeResponseDTO.builder()
                 .names("Juan")
                 .registrationId(1L)
                 .build();
@@ -60,12 +60,12 @@ class EmployeeServiceImplTest {
         when(soapEmployeeClient.saveEmployee(validatedEmployee)).thenReturn(soapResponse);
         when(employeeMapper.toResponse(
                 eq(validatedEmployee),
-                any(PeriodDto.class),
-                any(PeriodDto.class),
+                any(PeriodDTO.class),
+                any(PeriodDTO.class),
                 eq(soapResponse)
         )).thenReturn(expectedResponse);
 
-        EmployeeResponse response = employeeService.registerEmployee(request);
+        EmployeeResponseDTO response = employeeService.registerEmployee(request);
 
         assertNotNull(response);
         assertEquals(1L, response.getRegistrationId());
@@ -73,8 +73,8 @@ class EmployeeServiceImplTest {
         verify(soapEmployeeClient).saveEmployee(validatedEmployee);
         verify(employeeMapper).toResponse(
                 eq(validatedEmployee),
-                any(PeriodDto.class),
-                any(PeriodDto.class),
+                any(PeriodDTO.class),
+                any(PeriodDTO.class),
                 eq(soapResponse)
         );
     }
@@ -97,14 +97,14 @@ class EmployeeServiceImplTest {
         when(validationService.validate(any())).thenReturn(validatedEmployee);
         when(soapEmployeeClient.saveEmployee(any())).thenReturn(soapResponse);
         when(employeeMapper.toResponse(any(), any(), any(), any()))
-                .thenReturn(EmployeeResponse.builder().registrationId(2L).build());
+                .thenReturn(EmployeeResponseDTO.builder().registrationId(2L).build());
 
         employeeService.registerEmployee(request);
 
         verify(employeeMapper).toResponse(
                 eq(validatedEmployee),
-                any(PeriodDto.class),
-                any(PeriodDto.class),
+                any(PeriodDTO.class),
+                any(PeriodDTO.class),
                 eq(soapResponse)
         );
     }

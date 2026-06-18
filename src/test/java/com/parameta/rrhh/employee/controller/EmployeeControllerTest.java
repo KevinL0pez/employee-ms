@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.parameta.rrhh.employee.config.TestJwtDecoderConfig;
 import com.parameta.rrhh.employee.config.TestWebSecurityConfig;
 import com.parameta.rrhh.employee.security.JwtAuthorityConverter;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.exception.GlobalExceptionHandler;
 import com.parameta.rrhh.employee.service.IEmployeeService;
 import org.junit.jupiter.api.Test;
@@ -35,10 +35,10 @@ class EmployeeControllerTest {
     @Test
     void shouldReturnEmployeeResponse() throws Exception {
         when(employeeService.registerEmployee(any())).thenReturn(
-                EmployeeResponse.builder()
+                EmployeeResponseDTO.builder()
                         .names("Juan")
                         .registrationId(1L)
-                        .currentAge(PeriodDto.builder().years(36).months(0).days(0).build())
+                        .currentAge(PeriodDTO.builder().years(36).months(0).days(0).build())
                         .build()
         );
 

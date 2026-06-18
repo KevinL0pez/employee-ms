@@ -1,4 +1,4 @@
-package com.parameta.rrhh.employee.domain;
+package com.parameta.rrhh.employee.dto;
 
 import java.time.LocalDate;
 

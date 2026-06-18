@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.exception.SoapServiceException;
 import com.parameta.rrhh.employee.mapper.EmployeeMapper;
 import com.parameta.rrhh.employee.soap.EmployeeType;

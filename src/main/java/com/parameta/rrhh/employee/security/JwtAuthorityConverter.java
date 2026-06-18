@@ -11,13 +11,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 /**
- * Bridges JWT claims to Spring Security {@link org.springframework.security.core.GrantedAuthority}.
- *
- * <p>Supports two token issuers without code changes in controllers:
- * <ul>
- *   <li><strong>Local:</strong> reads the {@code roles} claim (e.g. {@code ["RRHH"]})</li>
- *   <li><strong>Cognito:</strong> reads {@code cognito:groups} and maps them to {@code ROLE_*} authorities</li>
- * </ul>
+ * Maps the JWT {@code roles} claim to Spring Security {@link org.springframework.security.core.GrantedAuthority}.
  *
  * <p>Used by the OAuth2 resource server configured in {@link SecurityConfig}.
  */
@@ -47,9 +41,6 @@ public class JwtAuthorityConverter {
         }
         if (rolesClaim instanceof String role) {
             return List.of(role);
-        }
-        if (jwt.hasClaim("cognito:groups")) {
-            return jwt.getClaimAsStringList("cognito:groups");
         }
         return List.of();
     }

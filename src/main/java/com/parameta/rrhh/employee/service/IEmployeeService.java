@@ -1,7 +1,7 @@
 package com.parameta.rrhh.employee.service;
 
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
 
 /**
  * Application service for employee registration.
@@ -14,5 +14,5 @@ public interface IEmployeeService {
      * @param requestDTO incoming employee data
      * @return registration result with age and affiliation time
      */
-    EmployeeResponse registerEmployee(EmployeeRequestDTO requestDTO);
+    EmployeeResponseDTO registerEmployee(EmployeeRequestDTO requestDTO);
 }

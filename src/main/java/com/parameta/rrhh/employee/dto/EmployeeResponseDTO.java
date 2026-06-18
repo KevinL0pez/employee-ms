@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeResponse {
+public class EmployeeResponseDTO {
 
     private String names;
     private String lastNames;
@@ -22,8 +22,8 @@ public class EmployeeResponse {
     private String dateAffiliationCompany;
     private String position;
     private Double salary;
-    private PeriodDto currentAge;
-    private PeriodDto affiliationTime;
+    private PeriodDTO currentAge;
+    private PeriodDTO affiliationTime;
     private Long registrationId;
     private String message;
 }

@@ -1,6 +1,6 @@
 package com.parameta.rrhh.employee.util;
 
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -15,9 +15,9 @@ public final class PeriodCalculatorUtil {
     /**
      * Calculates the elapsed time from {@code from} until today.
      */
-    public static PeriodDto calculate(LocalDate from) {
+    public static PeriodDTO calculate(LocalDate from) {
         Period period = Period.between(from, LocalDate.now());
-        return PeriodDto.builder()
+        return PeriodDTO.builder()
                 .years(period.getYears())
                 .months(period.getMonths())
                 .days(period.getDays())

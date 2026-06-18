@@ -1,9 +1,9 @@
 package com.parameta.rrhh.employee.service.impl;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.client.SoapEmployeeClient;
 import com.parameta.rrhh.employee.mapper.EmployeeMapper;
 import com.parameta.rrhh.employee.service.IEmployeeService;
@@ -28,7 +28,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     private final EmployeeMapper employeeMapper;
 
     @Override
-    public EmployeeResponse registerEmployee(EmployeeRequestDTO requestDTO) {
+    public EmployeeResponseDTO registerEmployee(EmployeeRequestDTO requestDTO) {
         Objects.requireNonNull(requestDTO, "Employee request must not be null");
 
         log.info("Starting employee registration for document {}", maskDocument(requestDTO.getDocumentNumber()));
@@ -36,10 +36,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
         ValidatedEmployee employee = iEmployeeValidationService.validate(requestDTO);
         SaveEmployeeResponse soapResponse = soapEmployeeClient.saveEmployee(employee);
 
-        PeriodDto currentAge = PeriodCalculatorUtil.calculate(employee.dateOfBirth());
-        PeriodDto bondingTime = PeriodCalculatorUtil.calculate(employee.dateAffiliationCompany());
+        PeriodDTO currentAge = PeriodCalculatorUtil.calculate(employee.dateOfBirth());
+        PeriodDTO bondingTime = PeriodCalculatorUtil.calculate(employee.dateAffiliationCompany());
 
-        EmployeeResponse response = employeeMapper.toResponse(
+        EmployeeResponseDTO response = employeeMapper.toResponse(
                 employee,
                 currentAge,
                 bondingTime,

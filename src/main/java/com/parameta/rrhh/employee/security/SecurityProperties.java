@@ -11,8 +11,7 @@ import org.springframework.util.StringUtils;
 /**
  * Type-safe binding of {@code app.security.*} properties from YAML and environment variables.
  *
- * <p>On startup, validates that {@code JWT_SECRET} (≥ 32 chars) and {@code APP_PASSWORD}
- * are present when {@code JWT_MODE=local}. Cognito mode skips local secret validation.
+ * <p>On startup, validates that {@code JWT_SECRET} (≥ 32 chars) and {@code APP_PASSWORD} are present.
  */
 @Getter
 @Setter
@@ -25,38 +24,26 @@ public class SecurityProperties {
 
     @PostConstruct
     void validate() {
-        if (!jwt.isLocalMode()) {
-            return;
-        }
         if (!StringUtils.hasText(jwt.getSecret()) || jwt.getSecret().length() < 32) {
             throw new IllegalStateException(
-                    "JWT_SECRET must be set and contain at least 32 characters when JWT_MODE=local"
+                    "JWT_SECRET must be set and contain at least 32 characters"
             );
         }
         if (!StringUtils.hasText(user.getPassword())) {
-            throw new IllegalStateException("APP_PASSWORD must be set when JWT_MODE=local");
+            throw new IllegalStateException("APP_PASSWORD must be set");
         }
     }
 
-    /** JWT issuer, secret, expiration and deployment mode ({@code local} | {@code cognito}). */
+    /** JWT issuer, secret and expiration settings. */
     @Getter
     @Setter
     public static class Jwt {
-        private String mode = "local";
         private String secret;
         private String issuer = "parameta-employee-ms";
         private int expirationMinutes = 60;
-
-        public boolean isLocalMode() {
-            return "local".equalsIgnoreCase(mode);
-        }
-
-        public boolean isCognitoMode() {
-            return "cognito".equalsIgnoreCase(mode);
-        }
     }
 
-    /** Credentials for {@code POST /auth/login} in local mode ({@code APP_USER}, {@code APP_PASSWORD}). */
+    /** Credentials for {@code POST /auth/login} ({@code APP_USER}, {@code APP_PASSWORD}). */
     @Getter
     @Setter
     public static class User {

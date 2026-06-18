@@ -1,6 +1,6 @@
 package com.parameta.rrhh.employee.service.impl;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
 import com.parameta.rrhh.employee.service.IEmployeeValidationService;
 import com.parameta.rrhh.employee.validation.groovy.GroovyEmployeeValidationEngine;

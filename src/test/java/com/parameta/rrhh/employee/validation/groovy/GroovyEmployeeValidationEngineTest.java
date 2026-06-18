@@ -41,12 +41,10 @@ class GroovyEmployeeValidationEngineTest {
 
     @Test
     void shouldFailWhenScriptIsMissing() {
-        GroovyEmployeeValidationEngine missingScriptEngine = new GroovyEmployeeValidationEngine(
+        assertThrows(IllegalStateException.class, () -> new GroovyEmployeeValidationEngine(
                 FIXED_CLOCK,
                 new DefaultResourceLoader().getResource("classpath:validation/missing-script.groovy")
-        );
-
-        assertThrows(IllegalStateException.class, () -> missingScriptEngine.validate(validRequest()));
+        ));
     }
 
     private EmployeeRequestDTO validRequest() {

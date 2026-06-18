@@ -1,8 +1,8 @@
 package com.parameta.rrhh.employee.mapper;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
-import com.parameta.rrhh.employee.dto.EmployeeResponse;
-import com.parameta.rrhh.employee.dto.PeriodDto;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.EmployeeResponseDTO;
+import com.parameta.rrhh.employee.dto.PeriodDTO;
 import com.parameta.rrhh.employee.soap.EmployeeType;
 import com.parameta.rrhh.employee.soap.SaveEmployeeResponse;
 import org.springframework.stereotype.Component;
@@ -26,13 +26,13 @@ public class EmployeeMapper {
         );
     }
 
-    public EmployeeResponse toResponse(
+    public EmployeeResponseDTO toResponse(
             ValidatedEmployee employee,
-            PeriodDto currentAge,
-            PeriodDto affiliationTime,
+            PeriodDTO currentAge,
+            PeriodDTO affiliationTime,
             SaveEmployeeResponse soapResponse
     ) {
-        return EmployeeResponse.builder()
+        return EmployeeResponseDTO.builder()
                 .names(employee.names())
                 .lastNames(employee.lastNames())
                 .typeDocument(employee.typeDocument())

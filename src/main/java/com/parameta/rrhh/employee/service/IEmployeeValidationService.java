@@ -1,6 +1,6 @@
 package com.parameta.rrhh.employee.service;
 
-import com.parameta.rrhh.employee.domain.ValidatedEmployee;
+import com.parameta.rrhh.employee.dto.ValidatedEmployee;
 import com.parameta.rrhh.employee.dto.EmployeeRequestDTO;
 
 /**

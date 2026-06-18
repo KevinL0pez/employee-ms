@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,19 +15,15 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 /**
- * Issues HS256-signed JWT access tokens for the local authentication flow.
+ * Issues HS256-signed JWT access tokens after credential validation.
  *
  * <p>Flow: credentials are validated by Spring Security's {@link AuthenticationManager};
  * on success a JWT is built with {@code sub}, {@code iss}, {@code iat}, {@code exp}
  * and a custom {@code roles} claim. The token is returned to the client and is
  * <strong>not</strong> stored server-side (stateless session).
- *
- * <p>Active only when {@code JWT_MODE=local} (default). In Cognito mode this bean
- * is not registered and clients obtain tokens directly from AWS.
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.security.jwt.mode", havingValue = "local", matchIfMissing = true)
 public class LocalAuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -80,5 +75,13 @@ public class LocalAuthService {
      * @param tokenType   always {@code Bearer}
      * @param expiresIn   seconds until {@code exp} claim
      */
-    public record TokenResponse(String accessToken, String tokenType, long expiresIn) {}
+    @io.swagger.v3.oas.annotations.media.Schema(description = "JWT access token issued after successful login")
+    public record TokenResponse(
+            @io.swagger.v3.oas.annotations.media.Schema(description = "Signed JWT access token", example = "eyJhbGciOiJIUzI1NiIs...")
+            String accessToken,
+            @io.swagger.v3.oas.annotations.media.Schema(description = "Token type", example = "Bearer")
+            String tokenType,
+            @io.swagger.v3.oas.annotations.media.Schema(description = "Token lifetime in seconds", example = "3600")
+            long expiresIn
+    ) {}
 }
